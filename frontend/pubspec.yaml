@@ -1,0 +1,30 @@
+name: flutter_front_end
+description: A new Flutter project.
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.1.5 <4.0.0'
+
+dependencies:
+  audioplayers: ^1.1.1
+  dio: ^5.4.0
+  dropdown_button2: ^2.3.9
+  flutter:
+    sdk: flutter
+  get_it: ^7.6.7
+  msh_checkbox: ^2.0.1
+  permission_handler: ^11.0.1
+  provider: ^6.1.1
+  responsive_builder: ^0.7.0
+  speech_to_text: ^6.6.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+  - assets/SFBU-logo.png
