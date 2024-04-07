@@ -14,6 +14,15 @@ class SettingViewModel extends ChangeNotifier {
 
   String get curTranslateLanguage => _curTranslateLanguage; 
 
+  bool _shouldTranslate = false;
+
+  bool get shouldTranslate => _shouldTranslate;
+
+  set shouldTranslate(bool input) {
+    _shouldTranslate = input;
+    notifyListeners();
+  }
+
   set curAudio(String audio) {
     _curAudio = audio;
     notifyListeners();

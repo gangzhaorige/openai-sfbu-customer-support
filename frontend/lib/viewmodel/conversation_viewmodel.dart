@@ -13,9 +13,11 @@ class ConversationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> generateResponse(String question, String audio, String language) async {
-    MessageModel responseMessage = await locator<ChatRepository>().generateMessage(question, audio, language);
+  Future<void> generateResponse(String question, String audio, String language, bool translate) async {
+    print(translate);
+    MessageModel responseMessage = await locator<ChatRepository>().generateMessage(question, audio, language, translate);
     addMessage(responseMessage);
-    locator<AudioPlayerService>().playAudio(responseMessage.url);
+    print(responseMessage.url);
+    locator<AudioPlayerService>().playAudio('http://127.0.0.1:5000/mp3/${responseMessage.url}');
   }
 } 

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_front_end/locator.dart';
 import 'package:flutter_front_end/models/message_model.dart';
+import 'package:flutter_front_end/services/audio_services.dart';
 import 'package:flutter_front_end/viewmodel/setting_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
@@ -89,7 +91,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
     scrollDown();
     String question = _questionController.text;
     resetQuestion();
-    await Provider.of<ConversationViewModel>(context, listen: false).generateResponse(question, settings.curAudio, settings.curTranslateLanguage).then((value) {
+    await Provider.of<ConversationViewModel>(context, listen: false).generateResponse(question, settings.curAudio, settings.curTranslateLanguage, settings.shouldTranslate).then((value) {
       scrollDown();
     });
   }

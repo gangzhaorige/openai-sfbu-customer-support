@@ -2,15 +2,12 @@ from utils import *
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 # load pdf, video, and urls
 loaders = [
-    load_PDF('2023Catalog.pdf'),
-    load_video('https://www.youtube.com/watch?v=kuZNIvdwnMc'),
-    url_loader('https://www.sfbu.edu/admissions/student-health-insurance')
+    load_PDF('pdf/2023Catalog.pdf'),
 ]
 
 docs = []
 for loader in loaders:
     docs.extend(loader.load())
-
 
 # split in chunks
 text_splitter = RecursiveCharacterTextSplitter(
