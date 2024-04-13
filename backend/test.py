@@ -7,5 +7,3 @@ def init_api():
             key, value = line.strip().split("=")
             os.environ[key] = value
     openai.api_key = os.environ.get("OPENAI_API_KEY")
-
-init_api()

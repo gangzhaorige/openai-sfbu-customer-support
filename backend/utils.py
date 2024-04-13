@@ -1,9 +1,5 @@
-import os
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 import openai
-import sys
-import panel as pn  # GUI
-import numpy as np
-from dotenv import load_dotenv, find_dotenv
 from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAI, OpenAIEmbeddings
 from langchain_community.document_loaders import PyPDFLoader
@@ -15,7 +11,6 @@ from langchain_openai import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts import PromptTemplate
-
 
 delimiter = '```'
 
@@ -73,28 +68,34 @@ def translate_response(text, language):
     ] 
     return get_completion(messages_translate)
 
-def generate_response(memory, question):
-    llm = ChatOpenAI(model_name='ft:gpt-3.5-turbo-0125:learninggpt::9B9yn75L', temperature=0)
+def qa_chain(memory):
+    
+    llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
 
-    template = """
-    Assume you are San Francisco Bay University Assistant. Your task it to answer questions about the catalog. Use the following pieces of \
-    context to answer \
-    the question at the end. If you don't know \
-    the answer, \
-    just say that you don't know, don't try \
-    to make up an answer.
-    {context}
-    Question: {question}
-    Helpful Answer:"""
+    template = """You are San Francisco Bay University Assitant. 
+Use the following pieces of context to answer the question at the end. 
+If you don't know the answer, just say that you don't know, don't try to make up an answer.
+Keep the answer as detailed as possible.
+Context will delimited by ```
+Question will be delimited by ///
+
+Context: ```{context}```
+
+Question: ///{question}/// 
+
+Helpful Answer:"""
 
     QA_CHAIN_PROMPT = PromptTemplate(input_variables=["context", "question"],template=template)
     qa_chain = ConversationalRetrievalChain.from_llm(
         llm,
-        retriever=db_loader().as_retriever(),
+        retriever=db_loader().as_retriever(search_type="similarity", search_kwargs={"k": 3}),
         return_source_documents=True,
+        return_generated_question=True,
+        chain_type="stuff",
+        verbose=True,
         combine_docs_chain_kwargs={"prompt": QA_CHAIN_PROMPT},
         get_chat_history=lambda h : h,
         memory=memory,
     )
 
-    return qa_chain.invoke(input={"question": question})
+    return qa_chain

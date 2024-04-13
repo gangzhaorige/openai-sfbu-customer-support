@@ -11,7 +11,7 @@ for loader in loaders:
 
 # split in chunks
 text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size = 1500,
+    chunk_size = 1000,
     chunk_overlap = 150
 )
 

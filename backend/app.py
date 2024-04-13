@@ -1,18 +1,19 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 from flask_cors import CORS, cross_origin
 
 import openai
 from flask import Flask, Response, session, request
 from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
-from langchain_openai import ChatOpenAI
-from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferWindowMemory
-from langchain_core.messages import SystemMessage
-from langchain_core.prompts import ChatPromptTemplate
-from langchain.prompts import HumanMessagePromptTemplate
-from utils import db_loader, generate_response, input_moderation, translate_response
+
+from test import init_api
+from utils import input_moderation, qa_chain, translate_response
+load_dotenv()
+
+init_api()
 
 app = Flask(__name__)
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -40,6 +41,9 @@ memory = ConversationBufferWindowMemory(
     k=5
 )
 
+history = []
+
+
 @app.route('/generate', methods=['POST'])
 @cross_origin()
 def index():
@@ -51,13 +55,17 @@ def index():
     
     response = {}
     flagged = False
+    print('Moderation test on question.')
     if input_moderation(question):
         response['response'] = 'Inappropriate conversation detected.'
         flagged = True
 
     result = ''
+    qa = qa_chain(memory)
     if not flagged:
-        result = generate_response(memory, question)['answer']
+        print('Generating Content.')
+        result = qa.invoke({"question": question, "chat_history":history})['answer']
+    history.extend([(question, result)])
 
     if translate:
         result = translate_response(result, language)
@@ -65,16 +73,19 @@ def index():
     global counter
     speech_file_path = Path(f'reply{counter}.mp3')
 
+    print('Moderation test on response.')
     if input_moderation(result):
         response['response'] = 'Inappropriate conversation detected.'
         flagged = True
 
+    print('Generating Audio')
     with openai.audio.speech.with_streaming_response.create(
         model="tts-1",
         voice=audio.lower(),
         input=result if not flagged else response['response'],
     ) as response:
         response.stream_to_file(speech_file_path)
+        print('Done')
     counter += 1
     return {
         'response' : result if not flagged else 'Inappropriate conversation detected.',
@@ -83,6 +94,7 @@ def index():
 
 
 @app.route("/mp3/<filename>")
+@cross_origin()
 def streammp3(filename):
     print(filename)
     def generate():
@@ -95,4 +107,4 @@ def streammp3(filename):
     return response
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
