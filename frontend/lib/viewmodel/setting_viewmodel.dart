@@ -16,7 +16,16 @@ class SettingViewModel extends ChangeNotifier {
 
   bool _shouldTranslate = false;
 
+  bool _playAudio = true;
+
   bool get shouldTranslate => _shouldTranslate;
+
+  bool get playAudio => _playAudio;
+
+  set playAudio(bool input) {
+    _playAudio = input;
+    notifyListeners();
+  }
 
   set shouldTranslate(bool input) {
     _shouldTranslate = input;

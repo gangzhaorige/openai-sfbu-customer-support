@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_front_end/models/message_model.dart';
 import 'package:flutter_front_end/ui/message.dart';
+import 'package:flutter_front_end/ui/message_loading.dart';
 import 'package:provider/provider.dart';
 
 import '../ui/custom_input_field.dart';
@@ -53,7 +54,10 @@ class _ConversationState extends State<Conversation> {
                           children: [
                             for(MessageModel messageInfo in data.conversations) ...[
                               Message(messageInfo: messageInfo)
-                            ]
+                            ],
+                            if(data.isLoading) ...[
+                              const MessageLoading()
+                            ] 
                           ],
                         );
                       }

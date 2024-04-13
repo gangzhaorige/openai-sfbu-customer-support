@@ -27,8 +27,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   void initState() {
-    _questionController = TextEditingController();
     super.initState();
+    _questionController = TextEditingController();
     _initSpeech();
   }
 
@@ -91,7 +91,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
     scrollDown();
     String question = _questionController.text;
     resetQuestion();
-    await Provider.of<ConversationViewModel>(context, listen: false).generateResponse(question, settings.curAudio, settings.curTranslateLanguage, settings.shouldTranslate).then((value) {
+    await Provider.of<ConversationViewModel>(context, listen: false).generateResponse(question, settings.curAudio, settings.curTranslateLanguage, settings.shouldTranslate, settings.playAudio).then((value) {
       scrollDown();
     });
   }
@@ -133,7 +133,6 @@ class _CustomTextFieldState extends State<CustomTextField> {
               borderSide: const BorderSide(color: Colors.white),
               borderRadius: BorderRadius.circular(25.7),
             ),
-            
             suffixIcon: SizedBox(
               width: 100,
               child: Row(

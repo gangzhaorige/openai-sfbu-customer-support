@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_front_end/locator.dart';
+import 'package:flutter_front_end/services/audio_services.dart';
 import 'package:flutter_front_end/ui/ui_helper.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import '../constant.dart';
 import '../models/message_model.dart';
 
 class Message extends StatelessWidget {
@@ -19,8 +23,8 @@ class Message extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start, 
           children: [
-            Icon(
-              messageInfo.isSender ? Icons.message_sharp : Icons.chat_bubble,
+            FaIcon(
+              messageInfo.isSender ? FontAwesomeIcons.userPlus : FontAwesomeIcons.robot,
               color: Colors.white,
               size: 30
             ),
@@ -30,12 +34,29 @@ class Message extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    messageInfo.isSender ? 'You' : 'SFBU ChatBot',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        messageInfo.isSender ? 'You' : 'SFBU ChatBot',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20
+                        ),
+                      ),
+                      horizontalSpaceSmall,
+                      if(!messageInfo.isSender)...[
+                        GestureDetector(
+                          onTap: () async {
+                            await locator<AudioPlayerService>().playAudio('$url/mp3/${messageInfo.url}');
+                          },
+                          child: const Icon(
+                            Icons.volume_up,
+                            size: 20,
+                            color: Colors.white,
+                          ),
+                        )
+                      ],
+                    ],
                   ),
                   Text(
                     messageInfo.text,

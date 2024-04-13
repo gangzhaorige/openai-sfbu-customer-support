@@ -27,24 +27,8 @@ class MyDropDownTranslate extends StatelessWidget {
           children: [
             Consumer<SettingViewModel>(
               builder: (_, model, __) {
-                return MSHCheckbox(
-                  size: 30,
-                  value: model.shouldTranslate,
-                  colorConfig: MSHColorConfig.fromCheckedUncheckedDisabled(
-                    checkedColor: Colors.blue,
-                  ),
-                  style: MSHCheckboxStyle.stroke,
-                  onChanged: (selected) {
-                    model.shouldTranslate = selected;
-                  },
-                );
-              },
-            ),
-            Consumer<SettingViewModel>(
-              builder: (_, model, __) {
                 return DropdownButtonHideUnderline(
                   child: DropdownButton2<String>(
-                    isExpanded: true,
                     hint: Text(
                       'Select Item',
                       style: TextStyle(
@@ -78,6 +62,34 @@ class MyDropDownTranslate extends StatelessWidget {
                   ),
                 );
               }
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Text(
+                  'Translate Language',
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+                horizontalSpaceSmall,
+                Consumer<SettingViewModel>(
+                  builder: (_, model, __) {
+                    return MSHCheckbox(
+                      size: 24,
+                      value: model.shouldTranslate,
+                      colorConfig: MSHColorConfig.fromCheckedUncheckedDisabled(
+                        checkedColor: Colors.blue,
+                      ),
+                      style: MSHCheckboxStyle.stroke,
+                      onChanged: (selected) {
+                        model.shouldTranslate = selected;
+                      },
+                    );
+                  },
+                ),
+              ],
             ),
           ],
         )

@@ -1,11 +1,15 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_front_end/constant.dart';
 
 class DioApi {
 
   static Dio dio() {
     BaseOptions options = BaseOptions(
-      baseUrl: 'http://localhost:5000/',
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      baseUrl: url,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Access-Control-Allow-Origin': '*'
+      },
     );
     return Dio(options);
   }

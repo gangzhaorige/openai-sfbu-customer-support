@@ -8,7 +8,8 @@ class AudioPlayerService {
 
   AudioPlayer player = AudioPlayer();
 
-  void playAudio(String url) {
-    player.play(UrlSource(url));
+  Future<void> playAudio(String url) async {
+    await player.setSourceUrl(url, mimeType: 'audio/mpeg');
+    await player.play(UrlSource(url));
   }
 }
