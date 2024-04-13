@@ -23,9 +23,8 @@ class ConversationViewModel extends ChangeNotifier {
     await locator<ChatRepository>().generateMessage(question, audio, language, translate).then((responseMessage) async {
       addMessage(responseMessage);
       isLoading = false;
-      if(playAudio) {
-        await locator<AudioPlayerService>().playAudio('$url/mp3/${responseMessage.url}');
-      }
+      
+      await locator<AudioPlayerService>().playAudio('$url/stream/${responseMessage.url}/$audio');
     });
     notifyListeners();
   }

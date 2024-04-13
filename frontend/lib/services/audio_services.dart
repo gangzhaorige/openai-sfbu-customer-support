@@ -10,6 +10,6 @@ class AudioPlayerService {
 
   Future<void> playAudio(String url) async {
     await player.setSourceUrl(url, mimeType: 'audio/mpeg');
-    await player.play(UrlSource(url));
+    await player.play(UrlSource(url), mode: PlayerMode.lowLatency);
   }
 }

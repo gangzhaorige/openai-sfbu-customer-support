@@ -1,16 +1,17 @@
 import os
-from pathlib import Path
 from dotenv import load_dotenv
 from flask_cors import CORS, cross_origin
 
 import openai
-from flask import Flask, Response, session, request
+from flask import Flask, Response, request
 from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
 from langchain.memory import ConversationBufferWindowMemory
+import requests
 
 from test import init_api
 from utils import input_moderation, qa_chain, translate_response
+
 load_dotenv()
 
 init_api()
@@ -25,6 +26,7 @@ persist_directory = 'docs/chroma/'
 
 delimiter = '```'
 counter = 0
+
 
 embedding = OpenAIEmbeddings()
 
@@ -43,60 +45,66 @@ memory = ConversationBufferWindowMemory(
 
 history = []
 
+dic = {}
+
+inappropriate = 'Inappropriate conversation detected.'
 
 @app.route('/generate', methods=['POST'])
 @cross_origin()
 def index():
     form = request.form
     question = form.get('question')
-    audio = form.get('audio')
     language = form.get('language')
     translate = form.get('translate') == 'true'
     
-    response = {}
     flagged = False
-    print('Moderation test on question.')
-    if input_moderation(question):
-        response['response'] = 'Inappropriate conversation detected.'
-        flagged = True
+    flagged = input_moderation(question)
 
-    result = ''
     qa = qa_chain(memory)
-    if not flagged:
-        print('Generating Content.')
-        result = qa.invoke({"question": question, "chat_history":history})['answer']
+
+    result = qa.invoke({"question": question, "chat_history":history})['answer'] if not flagged else inappropriate
+
     history.extend([(question, result)])
 
     if translate:
         result = translate_response(result, language)
 
-    global counter
-    speech_file_path = Path(f'reply{counter}.mp3')
+    dic[f'reply{counter}.mp3'] = result
 
-    print('Moderation test on response.')
-    if input_moderation(result):
-        response['response'] = 'Inappropriate conversation detected.'
-        flagged = True
-
-    print('Generating Audio')
-    with openai.audio.speech.with_streaming_response.create(
-        model="tts-1",
-        voice=audio.lower(),
-        input=result if not flagged else response['response'],
-    ) as response:
-        response.stream_to_file(speech_file_path)
-        print('Done')
-    counter += 1
     return {
-        'response' : result if not flagged else 'Inappropriate conversation detected.',
-        'url': f'reply{counter - 1}.mp3'
+        'response' : result if not flagged else inappropriate,
+        'url': f'reply{counter}.mp3'
     }
+
+
+@app.route('/stream/<filename>/<string:audio>')
+def stream(filename, audio):
+    global counter
+    def generate():
+        url = "https://api.openai.com/v1/audio/speech"
+        headers = {
+            "Authorization": f'Bearer {os.getenv("OPENAI_API_KEY")}', 
+        }
+        data = {
+            "model": "tts-1",
+            "input": dic[f'reply{counter - 1}.mp3'],
+            "voice": audio.lower(),
+            "response_format": "mp3",
+        }
+        response = requests.post(url, headers=headers, json=data, stream=True)
+        if response.status_code == 200:
+            with open(filename, "wb") as f:
+                for chunk in response.iter_content(chunk_size=4096):
+                    f.write(chunk)
+                    yield chunk
+
+    counter += 1
+    return Response(generate(), mimetype="audio/mpeg")
 
 
 @app.route("/mp3/<filename>")
 @cross_origin()
 def streammp3(filename):
-    print(filename)
     def generate():
         with open(filename, "rb") as fwav:
             data = fwav.read(1024)

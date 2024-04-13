@@ -92,7 +92,6 @@ Helpful Answer:"""
         return_source_documents=True,
         return_generated_question=True,
         chain_type="stuff",
-        verbose=True,
         combine_docs_chain_kwargs={"prompt": QA_CHAIN_PROMPT},
         get_chat_history=lambda h : h,
         memory=memory,
