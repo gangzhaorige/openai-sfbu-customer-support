@@ -20,12 +20,19 @@ class ConversationViewModel extends ChangeNotifier {
   Future<void> generateResponse(String question, String audio, String language, bool translate, bool playAudio) async {
     isLoading = true;
     notifyListeners();
-    await locator<ChatRepository>().generateMessage(question, audio, language, translate).then((responseMessage) async {
+    locator<ChatRepository>().generateMessage(question, audio, language, translate).then((responseMessage) async {
       addMessage(responseMessage);
       isLoading = false;
       
       await locator<AudioPlayerService>().playAudio('$url/stream/${responseMessage.url}/$audio');
     });
     notifyListeners();
+  }
+
+   Future<void> clear() async {
+    locator<ChatRepository>().reset().then((value) {
+      conversations.clear();
+      notifyListeners();
+    });
   }
 } 

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_front_end/locator.dart';
 import 'package:flutter_front_end/models/message_model.dart';
+import 'package:flutter_front_end/repositories/chat_repository.dart';
 import 'package:flutter_front_end/services/audio_services.dart';
+import 'package:flutter_front_end/ui/dialog.dart';
 import 'package:flutter_front_end/viewmodel/setting_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
@@ -134,7 +136,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
               borderRadius: BorderRadius.circular(25.7),
             ),
             suffixIcon: SizedBox(
-              width: 100,
+              width: 175,
               child: Row(
                 children: [
                   IconButton(
@@ -150,6 +152,31 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     onPressed: addMessage,
                     icon: const Icon(
                       Icons.send,
+                      color: Colors.white,
+                    )
+                  ),
+                  IconButton(
+                    splashColor: Colors.transparent,
+                    onPressed: () async {
+                      String res = await locator<ChatRepository>().email('English', true);
+                      if(context.mounted){
+                        showDialog(
+                          context: context,
+                          builder:(context) {
+                          return MyEmail(email: res);
+                        });
+                      }
+                    },
+                    icon: const Icon(
+                      Icons.email,
+                      color: Colors.white,
+                    )
+                  ),
+                  IconButton(
+                    splashColor: Colors.transparent,
+                    onPressed: Provider.of<ConversationViewModel>(context, listen:  false).clear,
+                    icon: const Icon(
+                      Icons.restore,
                       color: Colors.white,
                     )
                   ),

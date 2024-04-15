@@ -95,6 +95,59 @@ Helpful Answer:"""
         combine_docs_chain_kwargs={"prompt": QA_CHAIN_PROMPT},
         get_chat_history=lambda h : h,
         memory=memory,
+        verbose=True,
     )
 
     return qa_chain
+
+def get_completion(
+        messages,
+        model="gpt-3.5-turbo",
+        temperature=0,
+    ): 
+    response = openai.chat.completions.create(
+        model=model,
+        messages=messages,
+        temperature=temperature, 
+    )
+    return response.choices[0].message.content
+
+def summarize(history):
+    system_message = f"""Assume that you are a SFBU assistant.\
+Given conversation between assistant and user.\
+Summarize the conversation.\
+Pay attention to specific details.\
+Assistant message will be delimited by ```\
+User message will be delimited by ///\
+"""
+    for conversation in history:
+        user, assistant = conversation
+        system_message += f'User: ///{user}///'
+        system_message += f'Assistant: ```{assistant}```'
+
+    user_message = f"""Provide a summarization about the conversation."""
+    prompt = [
+        {'role' : 'system', 'content' : system_message},
+        {'role' : 'user', 'content' : user_message},
+    ]
+    response = get_completion(prompt)
+    return response
+
+
+def generate_email(summary, selected_language):
+    print(selected_language)
+    system_message = f"""Assume that you are a SFBU assistant.\\
+The following information summary of conversation.\
+Generate an email in given language. The language is delimited by ///.\
+The summary would be delimited by ```.\
+Do not include any delimiter in the result.\
+```{summary}```
+"""
+    user_message = f"""
+    Please create an email with 100-word in ///{selected_language}/// to be sent to the customer.
+    """
+    messages =  [  
+        {'role' : 'system', 'content' : system_message},    
+        {'role' : 'user', 'content': user_message},
+    ] 
+    return get_completion(messages)

@@ -10,7 +10,7 @@ from langchain.memory import ConversationBufferWindowMemory
 import requests
 
 from test import init_api
-from utils import input_moderation, qa_chain, translate_response
+from utils import generate_email, input_moderation, qa_chain, summarize, translate_response
 
 load_dotenv()
 
@@ -18,9 +18,8 @@ init_api()
 
 app = Flask(__name__)
 openai.api_key = os.getenv("OPENAI_API_KEY")
-cors = CORS(app)
-app.config['CORS_HEADERS'] = 'Content-Type'
 
+cors = CORS(app)
 
 persist_directory = 'docs/chroma/'
 
@@ -66,6 +65,7 @@ def index():
 
     history.extend([(question, result)])
 
+    print(history)
     if translate:
         result = translate_response(result, language)
 
@@ -76,8 +76,24 @@ def index():
         'url': f'reply{counter}.mp3'
     }
 
+@app.route('/email', methods=['POST'])
+@cross_origin()
+def email():
+    language = request.form.get('language')
+    translate = request.form.get('translate') == 'true'
+    summary = summarize(history)
+    email = generate_email(summary, language) if translate else generate_email(summary, 'English')
+    return {'response': email}
+
+@app.route('/clear', methods=['GET'])
+@cross_origin()
+def clear():
+    history.clear()
+    return {'response': 'Success'}
+    
 
 @app.route('/stream/<filename>/<string:audio>')
+@cross_origin()
 def stream(filename, audio):
     global counter
     def generate():

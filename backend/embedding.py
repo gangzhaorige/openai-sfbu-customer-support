@@ -11,8 +11,9 @@ for loader in loaders:
 
 # split in chunks
 text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size = 1000,
-    chunk_overlap = 150
+    chunk_size = 700,
+    chunk_overlap = 200,
+    separators=['\n\n', '\n', ' ', '']
 )
 
 splits = text_splitter.split_documents(docs)
