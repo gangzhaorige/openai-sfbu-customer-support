@@ -65,7 +65,6 @@ def index():
 
     history.extend([(question, result)])
 
-    print(history)
     if translate:
         result = translate_response(result, language)
 

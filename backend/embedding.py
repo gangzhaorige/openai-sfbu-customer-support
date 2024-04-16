@@ -11,9 +11,8 @@ for loader in loaders:
 
 # split in chunks
 text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size = 700,
-    chunk_overlap = 200,
-    separators=['\n\n', '\n', ' ', '']
+    chunk_size = 1000,
+    chunk_overlap = 250,
 )
 
 splits = text_splitter.split_documents(docs)
@@ -25,7 +24,7 @@ for split in splits:
     embedding.embed_query(split.page_content)
 
 persist_directory = 'docs/chroma/'
-# # get_ipython().system('rm -rf ./docs/chroma')  
+# get_ipython().system('rm -rf ./docs/chroma')  
 
 # save it to vector space
 vectordb = Chroma.from_documents(

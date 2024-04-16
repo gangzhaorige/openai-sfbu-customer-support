@@ -136,7 +136,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
               borderRadius: BorderRadius.circular(25.7),
             ),
             suffixIcon: SizedBox(
-              width: 175,
+              width: 170,
               child: Row(
                 children: [
                   IconButton(
@@ -145,6 +145,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     icon: Icon(
                       _speechToText.isNotListening ? Icons.mic_off : Icons.mic,
                       color: Colors.white,
+                      size: 22,
                     )
                   ),
                   IconButton(
@@ -153,6 +154,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     icon: const Icon(
                       Icons.send,
                       color: Colors.white,
+                      size: 22,
                     )
                   ),
                   IconButton(
@@ -170,6 +172,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     icon: const Icon(
                       Icons.email,
                       color: Colors.white,
+                      size: 22,
                     )
                   ),
                   IconButton(
@@ -178,6 +181,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     icon: const Icon(
                       Icons.restore,
                       color: Colors.white,
+                      size: 22,
                     )
                   ),
                 ],
